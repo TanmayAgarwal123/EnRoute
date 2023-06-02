@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Vehicle Tracking</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.css" />
+  <style>
+    #map {
+      height: 400px;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.js"></script>
+  <script>
+    // Vehicle data with initial coordinates and icon URLs
+    var vehicles = [
+      {
+        name: "Vehicle 1",
+        initialCoordinates: [12.9692, 79.1559],
+        iconUrl: "vehicle1.png"
+      },
+      {
+        name: "Vehicle 2",
+        initialCoordinates: [34.0522, -118.2437],
+        iconUrl: "vehicle2.png"
+      }
+      // Add more vehicles with their respective initial coordinates and icon URLs
+    ];
+
+    // Create the map
+    var map = L.map('map').setView([37.7749, -122.4194], 10);
+
+    // Add OpenStreetMap tiles as the base layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // Initialize vehicle markers
+    var markers = [];
+
+    // Update vehicle positions
+    function updateVehiclePositions() {
+      for (var i = 0; i < vehicles.length; i++) {
+        var vehicle = vehicles[i];
+        var marker = markers[i];
+
+        // Check if the marker is already created
+        if (!marker) {
+          // Create a new marker
+          marker = L.marker(vehicle.initialCoordinates, { icon: L.icon({ iconUrl: vehicle.iconUrl, iconSize: [50, 50] }) }).addTo(map);
+          markers.push(marker);
+        } else {
+          // Generate random coordinates for simulation
+          var lat = vehicle.initialCoordinates[0] + Math.random() * 0.02 - 0.01;
+          var lng = vehicle.initialCoordinates[1] + Math.random() * 0.02 - 0.01;
+
+          // Update the marker position
+          marker.setLatLng([lat, lng]);
+        }
+      }
+
+      // Update vehicle positions every 1 second
+      setTimeout(updateVehiclePositions, 1000);
+    }
+
+    // Start updating vehicle positions
+    updateVehiclePositions();
+  </script>
+</body>
+</html>
