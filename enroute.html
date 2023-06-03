@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bus Tracking Website - About</title>
+  <link rel="stylesheet" type="text/css" href="hoponboard.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.css" />
+  <style>
+    #map {
+      height: 400px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Bus Tracking Website</h1>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+  <div id="map"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.js"></script>
+  <script>
+    let permissionGranted = false;
+
+    function getLocationData(count) {
+      if (!permissionGranted) {
+        console.log("Permission not granted.");
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const latitude = position.coords.latitude;
+          const longitude = position.coords.longitude;
+          console.log(`Latitude: ${latitude}`);
+          console.log(`Longitude: ${longitude}`);
+          updateVehiclePositions(latitude, longitude);
+        },
+        (error) => {
+          console.log("Error retrieving location data:", error);
+        }
+      );
+    }
+
+    function requestLocationPermission() {
+      navigator.permissions
+        .query({ name: "geolocation" })
+        .then((result) => {
+          if (result.state === "granted") {
+            permissionGranted = true;
+            loopWithTimer(1);
+          } else if (result.state === "prompt") {
+            navigator.geolocation.getCurrentPosition(
+              () => {
+                permissionGranted = true;
+                loopWithTimer(1);
+              },
+              () => {
+                console.log("Permission denied.");
+              }
+            );
+          } else {
+            console.log("Permission denied.");
+          }
+        });
+    }
+
+    function loopWithTimer(count) {
+      getLocationData(count);
+
+      setTimeout(() => {
+        loopWithTimer(count + 1);
+      }, 2000);
+    }
+    requestLocationPermission();
+
+    var vehicles = [
+      {
+        name: "Vehicle 1",
+        initialCoordinates: [12.9692, 79.1559],
+        iconUrl: "vehicle1.png"
+      },
+    ];
+
+    var map = L.map('map').setView([12.9692, 79.1559], 17);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    var markers = [];
+
+    function updateVehiclePositions(latitude, longitude) {
+      for (var i = 0; i < vehicles.length; i++) {
+        var vehicle = vehicles[i];
+        var marker = markers[i];
+
+        if (!marker) {
+          marker = L.marker(vehicle.initialCoordinates, { icon: L.icon({ iconUrl: vehicle.iconUrl, iconSize: [25, 25] }) }).addTo(map);
+          markers.push(marker);
+        } else {
+          marker.setLatLng([latitude, longitude]);
+        }
+      }
+    }
+
+    setInterval(() => {
+      getLocationData(1);
+    }, 2000);
+
+  </script>
+  <section id="about">
+    <div class="container">
+      <h2>About Us</h2>
+      <p>Welcome to the Bus Tracking Website, where you can easily track the location of your bus in real-time. No more waiting at bus stops or wondering when your bus will arrive. With our advanced tracking system, you can plan your journey more efficiently and save time.</p>
+      <p>Our platform provides you with up-to-date information on bus routes, schedules, and estimated arrival times. Whether you're a daily commuter or a tourist exploring a new city, our service will make your travel experience more convenient.</p>
+      <p>Our dedicated team of developers and transportation experts has designed this website to simplify your bus tracking experience. We strive to provide accurate and reliable information so that you can rely on our service with confidence.</p>
+    </div>
+  </section>
+
+  <footer>
+    <p>&copy; 2023 Bus Tracking Website. All rights reserved.</p>
+  </footer>
+</body>
+</html>
