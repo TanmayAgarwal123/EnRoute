@@ -1,2 +1,2 @@
 # EnRoute
-Shuttle tracking
+Navigate campus with ease
